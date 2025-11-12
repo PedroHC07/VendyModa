@@ -1,0 +1,23 @@
+[
+  {
+    "imagem": "img/Tenis.png",
+    "nome": "Tênis Esportivo",
+    "categoria": "Calçados",
+    "preco": "R$ 199,90",
+    "disponibilidade": "Em Estoque"
+  },
+  {
+    "imagem": "img/Bolsa.png",
+    "nome": "Bolsa de Couro",
+    "categoria": "Acessórios",
+    "preco": "R$ 249,90",
+    "disponibilidade": "Em Estoque"
+  },
+  {
+    "imagem": "img/Calça.png",
+    "nome": "Calça Jeans",
+    "categoria": "Roupas",
+    "preco": "R$ 149,90",
+    "disponibilidade": "Em Estoque"
+  }
+]
