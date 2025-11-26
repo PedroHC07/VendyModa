@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vendy Moda - Produtos</title>
+  <link id="theme-link" rel="stylesheet" href="css/estilo.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="logo" href="index.html">Vendy Moda</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="produtos.html">Produtos</a></li>
+      <li><a href="dados.html">Dados</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li><a href="equipe.html">Equipe</a></li>
+    </ul>
+    <button id="theme-toggle" class="btn-pink" type="button">Alternar tema</button>
+  </nav>
+
+  <section class="produtos">
+    <div style="display:flex;justify-content:space-between;align-items:center;max-width:1000px;margin:0 auto;">
+      <h1>Nossos Produtos</h1>
+      <a class="btn-pink" href="produto_novo.html">+ Novo produto</a>
+    </div>
+
+    <table id="produtos-table" style="max-width:1000px;margin:16px auto;">
+      <thead>
+        <tr>
+          <th>Imagem</th>
+          <th>Nome</th>
+          <th>Categoria</th>
+          <th>Preço</th>
+          <th>Disponibilidade</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Vendy Moda - Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="js/theme.js"></script>
+  <script>
+    async function carregarProdutos() {
+      const tbody = document.querySelector('#produtos-table tbody');
+      tbody.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
+
+      try {
+        const resp = await fetch('php/produtos_api.php');
+        if (!resp.ok) throw new Error('Falha ao consultar API');
+        const data = await resp.json();
+
+        tbody.innerHTML = '';
+        if (!Array.isArray(data) || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">Sem registros.</td></tr>';
+          return;
+        }
+
+        data.forEach(item => {
+          const tr = document.createElement('tr');
+          const preco = Number(item.preco).toFixed(2).replace('.', ',');
+
+          tr.innerHTML = `
+            <td><img src="${item.imagem || 'img/placeholder.png'}" alt="${item.nome}" style="width:80px"/></td>
+            <td>${item.nome}</td>
+            <td>${item.categoria}</td>
+            <td>R$ ${preco}</td>
+            <td>${item.disponibilidade}</td>
+            <td>
+              <a class="btn-pink" href="produto_editar.html?id=${item.id}">Editar</a>
+              <button class="btn-pink" data-id="${item.id}" data-nome="${item.nome}">Deletar</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('button[data-id]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const nome = btn.getAttribute('data-nome');
+            if (!confirm(`Tem certeza que deseja deletar "${nome}"?`)) return;
+
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('id', id);
+
+            const resp = await fetch('php/produtos_api.php', { method: 'POST', body: formData });
+            const json = await resp.json();
+
+            alert(json.success ? 'Registro deletado com sucesso.' : 'Erro ao deletar.');
+            carregarProdutos();
+          });
+        });
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6">Erro: ${e.message}</td></tr>`;
+      }
+    }
+    document.addEventListener('DOMContentLoaded', carregarProdutos);
+  </script>
+</body>
+</html>
