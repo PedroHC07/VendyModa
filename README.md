@@ -1,2 +1,0 @@
-# VendyModa
-Site de Moda
